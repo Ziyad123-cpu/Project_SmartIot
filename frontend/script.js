@@ -3,6 +3,7 @@
 // ===========================================================
 const SERVER_URL = "https://projectsmartiot-production.up.railway.app/get_data";
 const PUMP_URL = "https://projectsmartiot-production.up.railway.app/pump";
+const SCHEDULE_URL = "https://projectsmartiot-production.up.railway.app/set_schedule";
 
 const WEATHER_API_KEY = "5389081c78db5308304b01cd0a773e5e";
 const WEATHER_CITY = "Surabaya";
@@ -383,6 +384,47 @@ saveThresholdBtn.addEventListener("click", () => {
     alert(`✅ Batas Ambang Kelembaban diperbarui menjadi ${newValue}%.`);
 });
 
+
+// ===========================================================
+// ⏰ PENJADWALAN PENYIRAMAN (TAMBAHAN BARU)
+// ===========================================================
+const saveScheduleBtn = document.getElementById("saveSchedule");
+
+if (saveScheduleBtn) {
+    saveScheduleBtn.addEventListener("click", async () => {
+        const time = document.getElementById("scheduleTime").value;
+        const duration = document.getElementById("scheduleDuration").value;
+
+        if (!time || !duration) {
+            alert("⛔ Jam dan durasi wajib diisi");
+            return;
+        }
+
+        try {
+            const res = await fetch(SCHEDULE_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    time: time,
+                    duration: duration
+                })
+            });
+
+            const data = await res.json();
+
+            if (data.status === "ok") {
+                document.getElementById("activeSchedule").innerText =
+                    `${time} (${duration} menit)`;
+                alert("✅ Jadwal berhasil dikirim ke sistem");
+            } else {
+                alert("❌ Gagal menyimpan jadwal");
+            }
+        } catch (err) {
+            console.error("❌ Error schedule:", err);
+            alert("❌ Tidak dapat terhubung ke server");
+        }
+    });
+}
 
 // ===========================================================
 // 🧭 SIDEBAR NAVIGASI
